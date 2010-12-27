@@ -172,6 +172,23 @@ module ActiveRecord
         configure_connection
       end
 
+
+      def add_foreign_key(srctab, srccol, desttab, destcol, options = {})
+        key_name = options[:name] || "fk_#{srctab}_#{srccol}_#{desttab}_#{destcol}"
+
+        execute "ALTER TABLE #{srctab}" +
+          " ADD CONSTRAINT #{key_name}" +
+          " FOREIGN KEY(#{srccol}) REFERENCES #{desttab}(#{destcol})" +
+          " ON DELETE CASCADE"
+      end
+
+      def drop_foreign_key(srctab, srccol, desttab, destcol, options = {})
+        key_name = options[:name] || "fk_#{srctab}_#{srccol}_#{desttab}_#{destcol}"
+
+        execute "ALTER TABLE #{srctab} DROP FOREIGN KEY #{key_name}"
+        execute "ALTER TABLE #{srctab} DROP INDEX #{key_name}"
+      end
+
       def adapter_name
         ADAPTER_NAME
       end
